@@ -403,6 +403,11 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 //Log.d("classifyImage", "RESULT: " + resultString);
                 classificationResults.setText(resultString);
                 //Toast.makeText(MainActivity.this, resultString, Toast.LENGTH_SHORT).show();
+                Date now = new Date();
+                if (lastDate != null) {
+                    Log.d("analyze", String.format("Inference time: %d ms", now.getTime() - lastDate.getTime()));
+                }
+                lastDate = now;
             }
         }
         // close image to get next one
