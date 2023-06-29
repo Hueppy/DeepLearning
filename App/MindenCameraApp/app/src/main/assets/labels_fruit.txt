@@ -1,0 +1,25 @@
+apple
+apricot
+avocado
+banana
+bell pepper
+black berry
+blueberry
+cantaloupe
+cherry
+coconut
+eggplant
+grape
+grapefruit
+kiwi
+lemon
+lime
+mandarine
+nectarine
+orange
+pear
+pineapple
+pomegranate
+raspberry
+strawberry
+watermelon

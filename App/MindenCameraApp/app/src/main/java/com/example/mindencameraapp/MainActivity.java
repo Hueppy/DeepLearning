@@ -72,6 +72,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -107,10 +108,11 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
     private Interpreter tflite;
     // add your filename here (label names)
-    final String CLASSIFIER_LABEL_File = "labels_mobilenet_quant_v1_224.txt";
+    final String CLASSIFIER_LABEL_File = "labels_fruit.txt";
     // add your filename here (model file)
-    final String TF_LITE_File = "mobilenet_v1_1.0_224_quant.tflite";
+    final String TF_LITE_File = "20230626-130930-0-dynamic_quantized.tflite";
     List<String> clasifierLabels = null;
+    Date lastDate = null;
 
 
 
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
         imageAnalyzer = new ImageAnalysis.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                .setTargetRotation(previewView.getDisplay().getRotation())
+                .setTargetRotation(Surface.ROTATION_0)//previewView.getDisplay().getRotation())
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build();
@@ -303,11 +305,11 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
                 .build();
 
-        TensorImage tensorImage = new TensorImage(DataType.UINT8);
+        TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
         tensorImage.load(bitmapImage);
         tensorImage = imageProcessor.process(tensorImage);
         TensorBuffer probabilityBuffer =
-                TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                TensorBuffer.createFixedSize(new int[]{1, 25}, DataType.FLOAT32);
 
         if(null != tflite) {
             tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
@@ -379,17 +381,17 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                     .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
                     .build();
 
-            TensorImage tensorImage = new TensorImage(DataType.UINT8);
+            TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
             tensorImage.load(bitmapImage);
             tensorImage = imageProcessor.process(tensorImage);
             TensorBuffer probabilityBuffer =
-                    TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                    TensorBuffer.createFixedSize(new int[]{1, 25}, DataType.FLOAT32);
 
             if(null != tflite) {
                 tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
             }
             TensorProcessor probabilityProcessor =
-                    new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
+                    new TensorProcessor.Builder()/*.add(new NormalizeOp(0, 255))*/.build();
 
             String resultString = " ";
             if (null != clasifierLabels) {
